@@ -21,10 +21,7 @@ The entire pipeline is automated, scalable, and production-ready.
 
 ## 🧱 Architecture (Medallion)
 
-Raw → Bronze → Silver → Gold → BI/ML
-
-
-A full architecture diagram is included in `/docs/architecture_diagram.md`.
+![Architecture Diagram](architecture_diagram.png)
 
 ---
 
