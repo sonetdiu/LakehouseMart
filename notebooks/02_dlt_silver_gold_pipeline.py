@@ -1,177 +1,94 @@
-# Databricks notebook source
-# 02_dlt_silver_gold_pipeline.py
-
 import dlt
-from pyspark.sql.functions import (
-    col, to_timestamp, current_timestamp, input_file_name,
-    date_trunc, sum as _sum, countDistinct
-)
+from pyspark.sql.functions import col, current_timestamp
 
-# ---------- BRONZE (DLT-Managed, Optional) ----------
+# Assume pipeline "target" is set to catalog lakehouse and schema silver/gold appropriately,
+# or you fully qualify table names in decorators.
 
+# ----- BRONZE READ HELPERS -----
+def bronze_table(name: str):
+    return f"lakehouse.bronze.{name}"
+
+# ----- SILVER CUSTOMERS -----
 @dlt.table(
-    name="bronze_customers",
-    comment="Raw customers ingested from JSON"
+    name="customers_silver",
+    comment="Cleaned and conformed customers",
 )
-def bronze_customers():
+def customers_silver():
     return (
-        spark.readStream.format("cloudFiles")
-        .option("cloudFiles.format", "json")
-        .option("cloudFiles.inferColumnTypes", "true")
-        .load("/mnt/lakehousemart/raw/customers")
-        .withColumn("ingest_ts", current_timestamp())
-        .withColumn("source_file", input_file_name())
+        dlt.read_stream(bronze_table("customers_bronze"))
+            .dropDuplicates(["customer_id"])
+            .withColumn("load_ts", current_timestamp())
     )
 
+# ----- SILVER PRODUCTS -----
 @dlt.table(
-    name="bronze_products",
-    comment="Raw products ingested from JSON"
+    name="products_silver",
+    comment="Cleaned and conformed products",
 )
-def bronze_products():
+def products_silver():
     return (
-        spark.readStream.format("cloudFiles")
-        .option("cloudFiles.format", "json")
-        .option("cloudFiles.inferColumnTypes", "true")
-        .load("/mnt/lakehousemart/raw/products")
-        .withColumn("ingest_ts", current_timestamp())
-        .withColumn("source_file", input_file_name())
+        dlt.read_stream(bronze_table("products_bronze"))
+            .dropDuplicates(["product_id"])
+            .withColumn("load_ts", current_timestamp())
     )
 
+# ----- SILVER ORDERS -----
 @dlt.table(
-    name="bronze_orders",
-    comment="Raw orders ingested from JSON"
+    name="orders_silver",
+    comment="Cleaned and conformed orders with valid FKs",
 )
-def bronze_orders():
-    return (
-        spark.readStream.format("cloudFiles")
-        .option("cloudFiles.format", "json")
-        .option("cloudFiles.inferColumnTypes", "true")
-        .load("/mnt/lakehousemart/raw/orders")
-        .withColumn("ingest_ts", current_timestamp())
-        .withColumn("source_file", input_file_name())
+def orders_silver():
+    orders = dlt.read_stream(bronze_table("orders_bronze"))
+    customers = dlt.read("customers_silver")
+    products = dlt.read("products_silver")
+
+    joined = (
+        orders.alias("o")
+        .join(customers.alias("c"), "customer_id", "inner")
+        .join(products.alias("p"), "product_id", "inner")
+        .select(
+            "o.*",
+            col("c.country").alias("customer_country"),
+            col("p.category").alias("product_category"),
+        )
+        .withColumn("load_ts", current_timestamp())
     )
+    return joined
 
-# ---------- SILVER LAYER ----------
-
-@dlt.table(
-    name="silver_customers",
-    comment="Cleaned customer master data"
-)
-@dlt.expect_or_drop("valid_customer_id", "customer_id IS NOT NULL")
-def silver_customers():
-    df = dlt.read("bronze_customers")
-    return (
-        df
-        .dropDuplicates(["customer_id"])
-        .withColumn("signup_ts", to_timestamp("signup_ts"))
-    )
-
-@dlt.table(
-    name="silver_products",
-    comment="Cleaned product master data"
-)
-@dlt.expect_or_drop("valid_product_id", "product_id IS NOT NULL")
-def silver_products():
-    df = dlt.read("bronze_products")
-    return df.dropDuplicates(["product_id"])
-
-@dlt.table(
-    name="silver_orders",
-    comment="Cleansed and conformed orders"
-)
-@dlt.expect("valid_order_id", "order_id IS NOT NULL")
-@dlt.expect_or_drop("valid_order_ts", "order_ts IS NOT NULL")
-@dlt.expect_or_fail("positive_quantity", "quantity > 0")
-def silver_orders():
-    df = dlt.read_stream("bronze_orders")
-
-    df_clean = (
-        df
-        .withColumn("order_ts", to_timestamp(col("order_ts")))
-        .withColumn("unit_price", col("unit_price").cast("double"))
-        .withColumn("quantity", col("quantity").cast("int"))
-        .dropDuplicates(["order_id"])
-    )
-
-    return df_clean
-
-# ---------- GOLD DIMENSIONS ----------
-
-@dlt.table(
-    name="dim_customer",
-    comment="Customer dimension"
-)
-def dim_customer():
-    df = dlt.read("silver_customers")
-    return df.select(
-        col("customer_id").alias("customer_key"),
-        "first_name",
-        "last_name",
-        "email",
-        "country",
-        "segment",
-        "signup_ts"
-    )
-
-@dlt.table(
-    name="dim_product",
-    comment="Product dimension"
-)
-def dim_product():
-    df = dlt.read("silver_products")
-    return df.select(
-        col("product_id").alias("product_key"),
-        "product_name",
-        "category",
-        "sub_category",
-        "brand",
-        "list_price"
-    )
-
-# ---------- GOLD FACT & AGGREGATES ----------
-
+# ----- GOLD FACT TABLE -----
 @dlt.table(
     name="fact_orders",
-    comment="Fact table for orders"
+    comment="Gold fact table for orders",
 )
 def fact_orders():
-    orders = dlt.read("silver_orders")
-    customers = dlt.read("dim_customer")
-    products = dlt.read("dim_product")
-
-    fact = (
-        orders
-        .join(customers, orders.customer_id == customers.customer_key, "left")
-        .join(products, orders.product_id == products.product_key, "left")
-        .select(
-            orders.order_id,
-            orders.order_ts,
-            customers.customer_key,
-            products.product_key,
-            (orders.quantity * orders.unit_price).alias("order_amount"),
-            "quantity",
-            "status",
-            "payment_method",
-            orders.country.alias("order_country")
-        )
+    return (
+        dlt.read("orders_silver")
+            .select(
+                "order_id",
+                "order_ts",
+                "customer_id",
+                "product_id",
+                "quantity",
+                "unit_price",
+                "status",
+                "payment_method",
+                "country",
+                "product_category",
+                "customer_country",
+            )
     )
 
-    return fact
-
+# ----- GOLD AGGREGATE EXAMPLE -----
 @dlt.table(
-    name="gold_daily_sales",
-    comment="Daily sales metrics by date and country"
+    name="agg_revenue_by_country",
+    comment="Daily revenue by country",
 )
-def gold_daily_sales():
-    fact = dlt.read("fact_orders")
+def agg_revenue_by_country():
+    from pyspark.sql.functions import date_trunc, sum as _sum
 
     return (
-        fact
-        .withColumn("order_date", date_trunc("DAY", "order_ts"))
-        .groupBy("order_date", "order_country")
-        .agg(
-            _sum("order_amount").alias("total_revenue"),
-            _sum("quantity").alias("total_quantity"),
-            countDistinct("customer_key").alias("unique_customers")
-        )
+        dlt.read("fact_orders")
+            .withColumn("order_date", date_trunc("DAY", col("order_ts")))
+            .groupBy("order_date", "country")
+            .agg(_sum(col("quantity") * col("unit_price")).alias("total_revenue"))
     )
