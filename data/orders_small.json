@@ -1,0 +1,112 @@
+[
+  {
+    "order_id": "O001",
+    "order_ts": "2026-01-24T03:37:23.751759",
+    "customer_id": "C007",
+    "product_id": "P001",
+    "quantity": 5,
+    "unit_price": 484.77,
+    "status": "Completed",
+    "payment_method": "Bank Transfer",
+    "country": "USA"
+  },
+  {
+    "order_id": "O002",
+    "order_ts": "2026-01-10T03:37:23.751777",
+    "customer_id": "C010",
+    "product_id": "P010",
+    "quantity": 3,
+    "unit_price": 202.91,
+    "status": "Cancelled",
+    "payment_method": "Bank Transfer",
+    "country": "Germany"
+  },
+  {
+    "order_id": "O003",
+    "order_ts": "2026-01-08T03:37:23.751786",
+    "customer_id": "C001",
+    "product_id": "P006",
+    "quantity": 1,
+    "unit_price": 304.94,
+    "status": "Completed",
+    "payment_method": "PayPal",
+    "country": "Germany"
+  },
+  {
+    "order_id": "O004",
+    "order_ts": "2026-01-15T03:37:23.751792",
+    "customer_id": "C009",
+    "product_id": "P001",
+    "quantity": 4,
+    "unit_price": 152.72,
+    "status": "Pending",
+    "payment_method": "Credit Card",
+    "country": "UK"
+  },
+  {
+    "order_id": "O005",
+    "order_ts": "2026-01-11T03:37:23.751798",
+    "customer_id": "C007",
+    "product_id": "P002",
+    "quantity": 3,
+    "unit_price": 169.3,
+    "status": "Completed",
+    "payment_method": "PayPal",
+    "country": "Canada"
+  },
+  {
+    "order_id": "O006",
+    "order_ts": "2026-01-20T03:37:23.751808",
+    "customer_id": "C002",
+    "product_id": "P006",
+    "quantity": 2,
+    "unit_price": 343.34,
+    "status": "Cancelled",
+    "payment_method": "Bank Transfer",
+    "country": "Canada"
+  },
+  {
+    "order_id": "O007",
+    "order_ts": "2026-01-16T03:37:23.751814",
+    "customer_id": "C007",
+    "product_id": "P004",
+    "quantity": 1,
+    "unit_price": 164.85,
+    "status": "Pending",
+    "payment_method": "Bank Transfer",
+    "country": "Germany"
+  },
+  {
+    "order_id": "O008",
+    "order_ts": "2026-01-22T03:37:23.751820",
+    "customer_id": "C005",
+    "product_id": "P008",
+    "quantity": 4,
+    "unit_price": 376.53,
+    "status": "Pending",
+    "payment_method": "PayPal",
+    "country": "France"
+  },
+  {
+    "order_id": "O009",
+    "order_ts": "2026-02-02T03:37:23.751825",
+    "customer_id": "C003",
+    "product_id": "P010",
+    "quantity": 3,
+    "unit_price": 283.0,
+    "status": "Cancelled",
+    "payment_method": "PayPal",
+    "country": "UK"
+  },
+  {
+    "order_id": "O010",
+    "order_ts": "2026-01-15T03:37:23.751831",
+    "customer_id": "C005",
+    "product_id": "P006",
+    "quantity": 1,
+    "unit_price": 334.17,
+    "status": "Completed",
+    "payment_method": "Gift Card",
+    "country": "USA"
+  }
+]

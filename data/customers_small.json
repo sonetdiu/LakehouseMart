@@ -1,0 +1,92 @@
+[
+  {
+    "customer_id": "C001",
+    "first_name": "First1",
+    "last_name": "Last1",
+    "email": "user1@example.com",
+    "signup_ts": "2024-09-01T03:37:23.751500",
+    "country": "France",
+    "segment": "Wholesale"
+  },
+  {
+    "customer_id": "C002",
+    "first_name": "First2",
+    "last_name": "Last2",
+    "email": "user2@example.com",
+    "signup_ts": "2025-08-03T03:37:23.751519",
+    "country": "Canada",
+    "segment": "Wholesale"
+  },
+  {
+    "customer_id": "C003",
+    "first_name": "First3",
+    "last_name": "Last3",
+    "email": "user3@example.com",
+    "signup_ts": "2023-11-21T03:37:23.751527",
+    "country": "UK",
+    "segment": "Online"
+  },
+  {
+    "customer_id": "C004",
+    "first_name": "First4",
+    "last_name": "Last4",
+    "email": "user4@example.com",
+    "signup_ts": "2023-12-14T03:37:23.751533",
+    "country": "UK",
+    "segment": "Online"
+  },
+  {
+    "customer_id": "C005",
+    "first_name": "First5",
+    "last_name": "Last5",
+    "email": "user5@example.com",
+    "signup_ts": "2025-05-18T03:37:23.751538",
+    "country": "Germany",
+    "segment": "Retail"
+  },
+  {
+    "customer_id": "C006",
+    "first_name": "First6",
+    "last_name": "Last6",
+    "email": "user6@example.com",
+    "signup_ts": "2023-06-03T03:37:23.751542",
+    "country": "UK",
+    "segment": "Wholesale"
+  },
+  {
+    "customer_id": "C007",
+    "first_name": "First7",
+    "last_name": "Last7",
+    "email": "user7@example.com",
+    "signup_ts": "2024-08-03T03:37:23.751547",
+    "country": "Germany",
+    "segment": "Wholesale"
+  },
+  {
+    "customer_id": "C008",
+    "first_name": "First8",
+    "last_name": "Last8",
+    "email": "user8@example.com",
+    "signup_ts": "2025-05-24T03:37:23.751551",
+    "country": "France",
+    "segment": "Retail"
+  },
+  {
+    "customer_id": "C009",
+    "first_name": "First9",
+    "last_name": "Last9",
+    "email": "user9@example.com",
+    "signup_ts": "2023-08-31T03:37:23.751555",
+    "country": "USA",
+    "segment": "Online"
+  },
+  {
+    "customer_id": "C010",
+    "first_name": "First10",
+    "last_name": "Last10",
+    "email": "user10@example.com",
+    "signup_ts": "2025-11-03T03:37:23.751559",
+    "country": "Canada",
+    "segment": "Retail"
+  }
+]

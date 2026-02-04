@@ -1,0 +1,82 @@
+[
+  {
+    "product_id": "P001",
+    "product_name": "Product 1",
+    "category": "Home",
+    "sub_category": "Decor",
+    "brand": "BrandA",
+    "list_price": 223.24
+  },
+  {
+    "product_id": "P002",
+    "product_name": "Product 2",
+    "category": "Books",
+    "sub_category": "Fiction",
+    "brand": "BrandD",
+    "list_price": 174.57
+  },
+  {
+    "product_id": "P003",
+    "product_name": "Product 3",
+    "category": "Clothing",
+    "sub_category": "Kids",
+    "brand": "BrandC",
+    "list_price": 374.29
+  },
+  {
+    "product_id": "P004",
+    "product_name": "Product 4",
+    "category": "Books",
+    "sub_category": "Fiction",
+    "brand": "BrandA",
+    "list_price": 392.53
+  },
+  {
+    "product_id": "P005",
+    "product_name": "Product 5",
+    "category": "Electronics",
+    "sub_category": "Phones",
+    "brand": "BrandC",
+    "list_price": 30.07
+  },
+  {
+    "product_id": "P006",
+    "product_name": "Product 6",
+    "category": "Electronics",
+    "sub_category": "Accessories",
+    "brand": "BrandA",
+    "list_price": 454.12
+  },
+  {
+    "product_id": "P007",
+    "product_name": "Product 7",
+    "category": "Clothing",
+    "sub_category": "Women",
+    "brand": "BrandC",
+    "list_price": 101.85
+  },
+  {
+    "product_id": "P008",
+    "product_name": "Product 8",
+    "category": "Clothing",
+    "sub_category": "Men",
+    "brand": "BrandD",
+    "list_price": 381.02
+  },
+  {
+    "product_id": "P009",
+    "product_name": "Product 9",
+    "category": "Electronics",
+    "sub_category": "Phones",
+    "brand": "BrandB",
+    "list_price": 299.52
+  },
+  {
+    "product_id": "P010",
+    "product_name": "Product 10",
+    "category": "Books",
+    "sub_category": "Fiction",
+    "brand": "BrandC",
+    "list_price": 194.71
+  }
+]
