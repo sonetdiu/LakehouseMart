@@ -31,20 +31,23 @@ A full architecture diagram is included in `/docs/architecture_diagram.md`.
 ## 📂 Repository Structure
 
 /notebooks
-├── 01_bronze_auto_loader_ingestion.py
-├── 02_dlt_silver_gold_pipeline.py
-└── 03_gold_sql_exploration.sql
+  ├── 01_bronze_auto_loader_ingestion.py
+  ├── 02_dlt_silver_gold_pipeline.py
+  └── 03_gold_sql_exploration.sql
+
 /configs
-└── dlt_pipeline_config.json
+  └── dlt_pipeline_config.json
+
 /data
-├── customers_small.json
-├── products_small.json
-├── orders_small.json
-├── customers_large.json
-├── products_large.json
-└── orders_large.json
+  ├── customers_small.json
+  ├── products_small.json
+  ├── orders_small.json
+  ├── customers_large.json
+  ├── products_large.json
+  └── orders_large.json
+
 /docs
-└── architecture_diagram.md
+  └── architecture_diagram.md
 
 ---
 
