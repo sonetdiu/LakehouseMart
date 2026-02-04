@@ -1,38 +1,16 @@
--- Databricks notebook source
--- 03_gold_sql_exploration.sql
-
-USE CATALOG lakehousemart;
+USE CATALOG lakehouse;
 USE SCHEMA gold;
 
--- Quick sanity checks
-SELECT * FROM fact_orders LIMIT 20;
-SELECT * FROM gold_daily_sales ORDER BY order_date DESC LIMIT 20;
+-- Basic exploration
+SELECT * FROM fact_orders LIMIT 100;
 
--- Example: Top products by revenue
-CREATE OR REPLACE VIEW v_top_products_by_revenue AS
+-- Revenue by country
 SELECT
-  p.product_key,
-  p.product_name,
-  p.category,
-  SUM(f.order_amount) AS total_revenue,
-  SUM(f.quantity) AS total_quantity
-FROM fact_orders f
-LEFT JOIN dim_product p
-  ON f.product_key = p.product_key
-GROUP BY p.product_key, p.product_name, p.category
+  country,
+  SUM(quantity * unit_price) AS total_revenue
+FROM fact_orders
+GROUP BY country
 ORDER BY total_revenue DESC;
 
--- Example: Customer lifetime value
-CREATE OR REPLACE VIEW v_customer_lifetime_value AS
-SELECT
-  c.customer_key,
-  c.first_name,
-  c.last_name,
-  c.country,
-  SUM(f.order_amount) AS lifetime_value,
-  COUNT(DISTINCT f.order_id) AS order_count
-FROM fact_orders f
-LEFT JOIN dim_customer c
-  ON f.customer_key = c.customer_key
-GROUP BY c.customer_key, c.first_name, c.last_name, c.country
-ORDER BY lifetime_value DESC;
+-- Daily revenue by country (from aggregate table)
+SELECT * FROM agg_revenue_by_country ORDER BY order_date DESC, country;
