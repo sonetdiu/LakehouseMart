@@ -1,56 +1,77 @@
-# Databricks notebook source
-# 01_bronze_auto_loader_ingestion.py
+from pyspark.sql.functions import current_timestamp
 
-from pyspark.sql.functions import current_timestamp, input_file_name
+# ----- CONFIG -----
+catalog_name = "lakehouse"
+bronze_schema = "bronze"
 
-# ---------- CONFIG ----------
-raw_base_path = "/mnt/lakehousemart/raw"
-bronze_base_path = "/mnt/lakehousemart/bronze"
-checkpoint_base_path = "/mnt/lakehousemart/checkpoints/bronze"
+spark.sql(f"USE CATALOG {catalog_name}")
+spark.sql(f"USE {bronze_schema}")
 
-# Utility to start an Auto Loader stream
-def autoloader_ingest(entity: str, file_format: str = "json"):
-    raw_path = f"{raw_base_path}/{entity}"
-    target_path = f"{bronze_base_path}/{entity}"
-    checkpoint_path = f"{checkpoint_base_path}/{entity}"
+# Raw input paths (pointing to your external location URL)
+raw_base_path = "s3://my-lakehouse-bucket/raw"  # or abfss://...
+customers_raw_path = f"{raw_base_path}/customers"
+products_raw_path  = f"{raw_base_path}/products"
+orders_raw_path    = f"{raw_base_path}/orders"
 
-    df = (
-        spark.readStream.format("cloudFiles")
-        .option("cloudFiles.format", file_format)
-        .option("cloudFiles.inferColumnTypes", "true")
-        .load(raw_path)
+# Auto Loader schema locations (also in cloud storage)
+schema_base_path = "s3://my-lakehouse-bucket/autoloader-schema"
+customers_schema_path = f"{schema_base_path}/customers"
+products_schema_path  = f"{schema_base_path}/products"
+orders_schema_path    = f"{schema_base_path}/orders"
+
+# ----- CUSTOMERS BRONZE -----
+customers_bronze_df = (
+    spark.readStream
+        .format("cloudFiles")
+        .option("cloudFiles.format", "json")
+        .option("cloudFiles.schemaLocation", customers_schema_path)
+        .load(customers_raw_path)
         .withColumn("ingest_ts", current_timestamp())
-        .withColumn("source_file", input_file_name())
-    )
+)
 
-    (
-        df.writeStream
+(
+    customers_bronze_df
+        .writeStream
         .format("delta")
-        .option("checkpointLocation", checkpoint_path)
+        .option("checkpointLocation", f"{schema_base_path}/_checkpoints/customers_bronze")
         .outputMode("append")
-        .start(target_path)
-    )
+        .toTable("lakehouse.bronze.customers_bronze")
+)
 
-# ---------- START STREAMS ----------
-autoloader_ingest("customers", "json")
-autoloader_ingest("products", "json")
-autoloader_ingest("orders", "json")
+# ----- PRODUCTS BRONZE -----
+products_bronze_df = (
+    spark.readStream
+        .format("cloudFiles")
+        .option("cloudFiles.format", "json")
+        .option("cloudFiles.schemaLocation", products_schema_path)
+        .load(products_raw_path)
+        .withColumn("ingest_ts", current_timestamp())
+)
 
-# After a while, register tables (can also be done in SQL)
-spark.sql("""
-CREATE TABLE IF NOT EXISTS lakehousemart.bronze.customers
-USING DELTA
-LOCATION '/mnt/lakehousemart/bronze/customers'
-""")
+(
+    products_bronze_df
+        .writeStream
+        .format("delta")
+        .option("checkpointLocation", f"{schema_base_path}/_checkpoints/products_bronze")
+        .outputMode("append")
+        .toTable("lakehouse.bronze.products_bronze")
+)
 
-spark.sql("""
-CREATE TABLE IF NOT EXISTS lakehousemart.bronze.products
-USING DELTA
-LOCATION '/mnt/lakehousemart/bronze/products'
-""")
+# ----- ORDERS BRONZE -----
+orders_bronze_df = (
+    spark.readStream
+        .format("cloudFiles")
+        .option("cloudFiles.format", "json")
+        .option("cloudFiles.schemaLocation", orders_schema_path)
+        .load(orders_raw_path)
+        .withColumn("ingest_ts", current_timestamp())
+)
 
-spark.sql("""
-CREATE TABLE IF NOT EXISTS lakehousemart.bronze.orders
-USING DELTA
-LOCATION '/mnt/lakehousemart/bronze/orders'
-""")
+(
+    orders_bronze_df
+        .writeStream
+        .format("delta")
+        .option("checkpointLocation", f"{schema_base_path}/_checkpoints/orders_bronze")
+        .outputMode("append")
+        .toTable("lakehouse.bronze.orders_bronze")
+)
