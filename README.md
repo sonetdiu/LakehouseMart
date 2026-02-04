@@ -21,7 +21,7 @@ The entire pipeline is automated, scalable, and production-ready.
 
 ## 🧱 Architecture (Medallion)
 
-![Architecture Diagram](architecture_diagram.png)
+![Architecture Diagram](doc/architecture_diagram.png)
 
 ---
 
