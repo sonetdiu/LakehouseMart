@@ -49,6 +49,9 @@ A full architecture diagram is included in `/docs/architecture_diagram.md`.
 /docs
   └── architecture_diagram.md
 
+README.md
+
+
 ---
 
 ## 📥 Data Sources
